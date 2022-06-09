@@ -8,8 +8,14 @@ const ListPerson = () => {
     const [namePerson, setNamePerson] = useState("");
     const [showNew, setShowNew] = useState(false);
     const getPesons = async () => {
-        const res = await axios.get("http://localhost:3000/api/v1/persons/");
-        setPersons(res.data.data.persons.sort((a, b) => (a.rankNumber > b.rankNumber) ? 1 : (b.rankNumber > a.rankNumber) ? -1 : 0));
+        await axios.get("http://localhost:3000/api/v1/persons/")
+            .then(res => {
+                setPersons(res.data.data.persons.sort((a, b) => (a.rankNumber > b.rankNumber) ? 1 : (b.rankNumber > a.rankNumber) ? -1 : 0));
+            })
+            .catch(error => {
+                alert(error);
+            });
+
     }
     useEffect(() => {
         getPesons();
@@ -18,7 +24,7 @@ const ListPerson = () => {
         if (!persons.length) {
             await axios.post("http://localhost:3000/api/v1/persons/", { name: namePerson, rankNumber: 1 })
                 .then(res => {
-                    alert("Add person successfully");
+                    alert("Add person successfully!");
                     getPesons();
                 })
                 .catch(error => {
@@ -27,7 +33,7 @@ const ListPerson = () => {
         } else {
             await axios.post("http://localhost:3000/api/v1/persons/", { name: namePerson, rankNumber: persons[persons.length - 1].rankNumber + 1 })
                 .then(res => {
-                    alert("Add person successfully");
+                    alert("Add person successfully!");
                     getPesons();
                 })
                 .catch(error => {
@@ -40,14 +46,14 @@ const ListPerson = () => {
         if (window.confirm("You want delete person?")) {
             await axios.delete(`http://localhost:3000/api/v1/persons/${id}`)
                 .then(res => {
-                    alert("Delete person successfully");
+                    alert("Delete person successfully!");
                     getPesons();
                 })
                 .catch(error => {
                     alert(error);
                 })
         } else {
-            alert("Cancel")
+            alert("Cancel Delete!")
         }
 
     }
@@ -63,14 +69,26 @@ const ListPerson = () => {
     }
     const movePersonUp = async (person) => {
         const index = persons.indexOf(person);
-        await axios.patch(`http://localhost:3000/api/v1/persons/${person.id}`, { name: person.name, rankNumber: persons[index - 1].rankNumber });
-        await axios.patch(`http://localhost:3000/api/v1/persons/${persons[index - 1].id}`, { name: persons[index - 1].name, rankNumber: person.rankNumber });
+        await axios.patch(`http://localhost:3000/api/v1/persons/${person.id}`, { name: person.name, rankNumber: persons[index - 1].rankNumber })
+            .catch(error => {
+                alert(error);
+            });
+        await axios.patch(`http://localhost:3000/api/v1/persons/${persons[index - 1].id}`, { name: persons[index - 1].name, rankNumber: person.rankNumber })
+            .catch(error => {
+                alert(error);
+            });;
         getPesons();
     }
     const movePersonDown = async (person) => {
         const index = persons.indexOf(person);
-        await axios.patch(`http://localhost:3000/api/v1/persons/${person.id}`, { name: person.name, rankNumber: persons[index + 1].rankNumber });
-        await axios.patch(`http://localhost:3000/api/v1/persons/${persons[index + 1].id}`, { name: persons[index + 1].name, rankNumber: person.rankNumber });
+        await axios.patch(`http://localhost:3000/api/v1/persons/${person.id}`, { name: person.name, rankNumber: persons[index + 1].rankNumber })
+            .catch(error => {
+                alert(error);
+            });
+        await axios.patch(`http://localhost:3000/api/v1/persons/${persons[index + 1].id}`, { name: persons[index + 1].name, rankNumber: person.rankNumber })
+            .catch(error => {
+                alert(error);
+            });
         getPesons();
     }
     return (
